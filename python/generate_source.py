@@ -82,12 +82,17 @@ def saveImage(A, filename):
 	im.save("%s.png" % filename)
 
 
-def showImage(A, saveFig=False):
+def showImage(A, title=None, saveFilename=None):
 	plt.figure(1)
 	plt.imshow(A, interpolation='nearest')
 	plt.grid()
-	plt.draw()
-	plt.show()
+	if(title):
+		plt.title(title)
+	if(saveFilename):
+		plt.savefig(saveFilename)
+	else:
+		plt.draw()
+		plt.show()
 
 #showImage(rect(10.0, 100.0))
 #showImage(circle(30.0, 100.0))
