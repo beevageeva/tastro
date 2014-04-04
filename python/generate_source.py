@@ -60,7 +60,7 @@ def circles(r, l):
 	#print(a)
 	return a
 	
-
+#filename should contain extension
 def readImage(filename):
 	extension = filename[-4:]	
 	if(extension == ".png"):
@@ -81,10 +81,12 @@ def saveImage(A, filename):
 	im = Image.fromarray(A)
 	im.save("%s.png" % filename)
 
-
+#saveFilename should contain extension
 def showImage(A, title=None, saveFilename=None):
 	plt.figure(1)
-	plt.imshow(A, interpolation='nearest')
+	#plt.imshow(A, interpolation='nearest')
+	#antialiasing	
+	plt.imshow(A)
 	plt.grid()
 	if(title):
 		plt.title(title)
@@ -94,19 +96,5 @@ def showImage(A, title=None, saveFilename=None):
 		plt.draw()
 		plt.show()
 
-#showImage(rect(10.0, 100.0))
-#showImage(circle(30.0, 100.0))
-saveImage(rect(10.0, 100.0), "rect")
-saveImage(circle(30.0, 100.0), "circle")
-#showImage(circles([10.0,20.0,30.0,50.0], 100.0))
-A = circles([10.0,20.0,30.0,50.0], 100.0)
-#print("from source generation")
-#print(A)
-saveImage(A, "circles")
-#print("reading saved image")
-#B = readImage("circles.png")
-#print("from png")
-#print(B)
-#showImage(B)
 
 
