@@ -1,5 +1,6 @@
 from generate_source import readImage, showImage
 import numpy as np
+from math import sqrt
 
 #this is abstract  
 #it won't raise NotImplementedError
@@ -86,7 +87,6 @@ class SimpleLensTransformation(DefinedPointTransformation):
 
 
 class IsothermicSphereTransformation(DefinedPointTransformation):
-	from math import sqrt
 
 	def getSourcePixel(self, x1, x2):
 		#print("x01 = %E, x02 = %E" % (x01, x02))
@@ -110,24 +110,26 @@ class QuadrPertTransformation(DefinedPointTransformation):
 	
 	def getSourcePixel(self, x1, x2):
 		sres =  self.cls.getSourcePixel(self, x1, x2)
+		#print("getSourcePixel %E" % self.gamma)
 		return [(1.0 - self.gamma ) * sres[0], (1.0 + self.gamma) * sres[1]]
 
 	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, gammaStart, gammaEnd, gammaStep, outDir):
 		import os.path
 		for k in np.arange(gammaStart, gammaEnd, gammaStep):
 			#TODO format %4.3f
+			self.gamma = k
 			newdir = os.path.join(outDir, ("%4.3f" % k) )
 			os.mkdir(newdir)
 			DefinedPointTransformation.makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, newdir)
 
 
-class QuadrPertLensTransformation(QuadrPertTransformation):
+class QuadrPertLensTransformation(QuadrPertTransformation, SimpleLensTransformation):
 	
 	def __init__(self, x01, x02, gamma):
 		QuadrPertTransformation.__init__(self, SimpleLensTransformation, x01, x02, gamma)
 
 	
-class QuadrPertSphereTransformation(QuadrPertTransformation):
+class QuadrPertSphereTransformation(QuadrPertTransformation, IsothermicSphereTransformation):
 	
 	def __init__(self, x01, x02, gamma):
 		QuadrPertTransformation.__init__(self, IsothermicSphereTransformation, x01, x02, gamma)
