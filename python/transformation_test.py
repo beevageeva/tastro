@@ -19,8 +19,8 @@ nx = 200 #number of points of the image
 #xl, yl depends on problem geometry
 #xl = 8 #2*xl = number of matrix image elements (points) of a pixel (image plan)
 #yl = 4 #2*yl = number of matrix image elements (points) of a pixel (source plan)
-xl = 8
-yl = 0.5
+xl = 4
+yl = 1
 
 
 transformation = None
@@ -44,23 +44,25 @@ elif transformType == "isothermic_sphere":
 elif transformType == "isothermic_sphere_quadr_pert":
 	x01 = 0.25
 	x02 = 1 
-	gamma = 0.5 #this must be between [0.1 .. 0.7]
+	gamma = -0.5 #this must be between [0.1 .. 0.7]
 	transformation = QuadrPertSphereTransformation(x01, x02, gamma) 
 	
 
-
+#save image to file
 #showImage(transformation.transform(nx, xl, yl, "circles.png"), "Circles", "isoth.png")
+#print image on screen
+showImage(transformation.transform(nx, xl, yl, "circles.png"), "Circles") 
 			
 #folderBasename = "imgSimpleLens"
 #folderBasename = "imgIsothSph"
 #transformation.makeAnim(nx,xl,yl,"circles.png", 1, 0.05, createFolder(folderBasename))
 
 #folderBasename = "imgQuadPertLens"
-folderBasename = "imgQuadPertSphereNegGamma"
+#folderBasename = "imgQuadPertSphereNegGamma"
 #for a range
 #transformation.makeAnim(nx,xl,yl,"circles.png", 1, 0.05, 0.1, 0.7, 0.01, createFolder(folderBasename))
 #just for one gamma value 0.1 (the step) here can be any value except 0!
 #transformation.makeAnim(nx,xl,yl,"circles.png", 1, 0.05, 0.7, 0.701, 0.1, createFolder(folderBasename))
-transformation.makeAnim(nx,xl,yl,"circles.png", 2, 0.05, -0.5, -0.499, 0.1, createFolder(folderBasename))
+#transformation.makeAnim(nx,xl,yl,"circles.png", 2, 0.05, -0.6, -0.599, 0.1, createFolder(folderBasename))
 
 
