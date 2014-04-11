@@ -1,4 +1,4 @@
-from generate_source import readImage, showImage
+from generate_source import readImage, showImage, getImageSize
 import numpy as np
 from math import sqrt
 
@@ -33,6 +33,32 @@ class Transformation:
 					imageData[i][j] = sourceData[i1][i2] 
 		return imageData		
 
+	def getImageMag(self, nx, xl, yl, sourceImg):
+		#print("getSourceMag in Transformation")
+		sourceImSize = getImageSize(sourceImg)
+		ny = sourceImSize[0]
+		
+		##print("imageFile=%s, ny = %d" % (sourceImg, ny))
+	
+		xs = 2.0 * xl / nx  #size of pixel source in points
+		ys = 2.0 * yl / ny 
+	
+		imageMag = np.zeros((nx, nx))
+		for i in range(0, nx):
+			for j in range(0, nx):
+				#pixel -> coordinates in image
+				x1 = -float(xl) + i * xs
+				x2 = -float(xl) + j * xs
+				#identity x1->y1 , x2->y2
+				sourcePixel = self.getSourcePixel(x1, x2)
+				y1 = sourcePixel[0]
+				y2 = sourcePixel[1]
+				#find corresponding points in image space
+				i1 = int((y1+yl)/ys)
+				i2 = int((y2+yl)/ys) 
+				if (i1>=0 and i1<=ny-1) and (i2>=0 and i2<=ny-1):
+					imageMag[i][j] += 1
+		return imageMag		
 
 
 class IdentityTransformation(Transformation):
@@ -104,17 +130,10 @@ class IsothermicSphereTransformation(DefinedPointTransformation):
 
 
 class QuadrPertTransformation(DefinedPointTransformation):
-	def __init__(self, cls, x01, x02, gamma):
+	def __init__(self, x01, x02, gamma):
 		DefinedPointTransformation.__init__(self, x01, x02)
-		self.cls = cls
 		self.gamma = gamma
 
-	
-	def getSourcePixel(self, x1, x2):
-		#print("getSourcePixel(%E, %E) QuadrPertTransformation self.01 = %E, self.x02 = %E, self.gamma = %E" % (x1, x2, self.x01, self.x02, self.gamma))
-		sres =  self.cls.getSourcePixel(self, x1, x2)
-		##print("getSourcePixel %E" % self.gamma)
-		return [(1.0 - self.gamma ) * sres[0], (1.0 + self.gamma) * sres[1]]
 
 	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, gammaStart, gammaEnd, gammaStep, outDir):
 		#print("QuadrPertTransformation.makeAnim")
@@ -127,14 +146,32 @@ class QuadrPertTransformation(DefinedPointTransformation):
 			DefinedPointTransformation.makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, newdir)
 
 
-class QuadrPertLensTransformation(QuadrPertTransformation, SimpleLensTransformation):
+class QuadrPertLensTransformation(QuadrPertTransformation):
 	
-	def __init__(self, x01, x02, gamma):
-		QuadrPertTransformation.__init__(self, SimpleLensTransformation, x01, x02, gamma)
+
+	def getSourcePixel(self, x1, x2):
+		#print("getSourcePixel(%E, %E) QuadrPertTransformation self.01 = %E, self.x02 = %E, self.gamma = %E" % (x1, x2, self.x01, self.x02, self.gamma))
+		#sres =  self.cls.getSourcePixel(self, x1, x2)
+		if x1 == self.x01 and x2 == self.x02:
+			d = 0.0000001 #la chapuza
+		else:
+			d = (x1 - self.x01)**2 + (x2 - self.x02)**2
+		##print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
+		y1 =  (x1 - self.x01)/d
+		y2 =  (x2 - self.x02)/d
+		##print("getSourcePixel %E" % self.gamma)
+		return [(1.0 - self.gamma ) * x1 - y1, (1.0 + self.gamma) * x2 - y2]
 
 	
-class QuadrPertSphereTransformation(QuadrPertTransformation, IsothermicSphereTransformation):
-	
-	def __init__(self, x01, x02, gamma):
-		QuadrPertTransformation.__init__(self, IsothermicSphereTransformation, x01, x02, gamma)
+class QuadrPertSphereTransformation(QuadrPertTransformation):
 		
+	def getSourcePixel(self, x1, x2):
+		#print("getSourcePixel(%E, %E) IsothermicSphereTransformation self.01 = %E, self.x02 = %E" % (x1, x2, self.x01, self.x02))
+		if x1 == self.x01 and x2 == self.x02:
+			d = 0.0000001 #la chapuza
+		else:
+			d = sqrt((x1 - self.x01)**2 + (x2 - self.x02)**2)
+		##print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
+		y1 = (x1 - self.x01)/d
+		y2 =  (x2 - self.x02)/d
+		return [(1.0 - self.gamma ) * x1 - y1, (1.0 + self.gamma) * x2 - y2]

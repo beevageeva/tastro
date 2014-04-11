@@ -72,6 +72,11 @@ def readImage(filename):
 		img = Image.open(filename).getdata() 
 	return img
 
+def getImageSize(filename):
+	import Image
+	return Image.open(filename).size
+
+
 
 #filename should not contain extension
 #I want always png
