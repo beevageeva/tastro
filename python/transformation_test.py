@@ -23,6 +23,8 @@ nx = 1000 #number of points of the image
 xl = 4
 yl = 1
 
+#imgFilename = "circle.png"
+imgFilename = "circles.png"
 
 transformation = None
 
@@ -49,38 +51,57 @@ elif transformType == "isothermic_sphere_quadr_pert":
 	transformation = QuadrPertSphereTransformation(x01, x02, gamma) 
 	
 
-#save image to file
-#showImage(transformation.transform(nx, xl, yl, "circles.png"), "Circles", "isoth.png")
-#print image on screen
-#showImage(transformation.transform(nx, xl, yl, "circles.png"), "Circles") 
-#image mag
+def transformImage(saveToFile = False):
+	title = "%s_%s" % (transformType, imgFilename[:-4])
+	if(saveToFile):
+		showImage(transformation.transform(nx, xl, yl, imgFilename), title, title+".png")
+	else:
+		showImage(transformation.transform(nx, xl, yl, imgFilename), title)
 
-#print("image mag")
-#showImage(transformation.transform(nx, xl, yl, "circles.png"), "circles")
-#imageMag = transformation.getImageMag(nx, xl, yl, "circles.png")
-##np.set_printoptions(threshold=np.nan)
-##print(imageMag)
-#x = range(0, nx)
-##hor projection
-#pproj = int(0.5*nx)
-##plt.plot(x, imageMag[pproj,:])
-##hvert projection
-#plt.plot(x, imageMag[:,pproj])
-#plt.draw()
-#plt.show()
+
+
+def getImageMag():
+	print("image mag")
+	title = "%s_%s" % (transformType, imgFilename[:-4])	
+	showImage(transformation.transform(nx, xl, yl, imgFilename), title)
+	imageMag = transformation.getImageMag(nx, xl, yl, imgFilename)
+	#np.set_printoptions(threshold=np.nan)
+	#print(imageMag)
+	#hor projection
+	#plt.plot(range(0, imageMag.shape[0]), imageMag[int(0.5 * imageMag.shape[0]),:])
+	#hvert projection
+	plt.plot(range(0, imageMag.shape[1]), imageMag[:,int(0.5 * imageMag.shape[0])])
+	plt.draw()
+	plt.show()
 
 			
-#folderBasename = "imgSimpleLens"
-#folderBasename = "imgIsothSph"
-#transformation.makeAnim(nx,xl,yl,"circles.png", 1, 0.05, createFolder(folderBasename))
 
-#folderBasename = "imgQuadPertLens"
-folderBasename = "imgQuadPertSphereCircle"
-#folderBasename = "imgQuadPertSphereNegGamma"
-#for a range
-#transformation.makeAnim(nx,xl,yl,"circle.png", 1, 0.05, 0.1, 0.7, 0.01, createFolder(folderBasename))
-#just for one gamma value 0.1 (the step) here can be any value except 0!
-#transformation.makeAnim(nx,xl,yl,"circles.png", 1, 0.05, 0.7, 0.701, 0.1, createFolder(folderBasename))
-transformation.makeAnim(nx,xl,yl,"circle.png", 2, 0.05, -0.6, -0.599, 0.1, createFolder(folderBasename))
+def createAnimation():
+	endX01X02 = 2
+	stepX01X02 = 0.1
+	folderBasename = "img_%s_%s" % (transformType, imgFilename[:-4])
+	if(isinstance(transformation, QuadrPertTransformation)):
+		#for a range
+		startGamma = 0.6
+		endGamma = 0.71
+		stepGamma = 0.05
+#		#negative gamma
+#		startGamma = -0.7
+#		endGamma = -0.1
+#		stepGamma = 0.01
+#		#only one point
+#		#just for one gamma value 0.1 (the step) here can be any value except 0!
+#		startGamma = -0.6
+#		endGamma = -0.599
+#		stepGamma = 0.1
+		transformation.makeAnim(nx,xl,yl,imgFilename, endX01X02, stepX01X02, startGamma, endGamma, stepGamma, createFolder(folderBasename))
+	else:
+		transformation.makeAnim(nx,xl,yl,imgFilename, endX01X02, stepX01X02, createFolder(folderBasename))
+
+
+
+#transformImage(True)
+createAnimation()
+#getImageMag()
 
 

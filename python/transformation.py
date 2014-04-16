@@ -11,7 +11,7 @@ class Transformation:
 		sourceData = readImage(sourceImg)
 		ny = sourceData.shape[0]
 		
-		##print("imageFile=%s, ny = %d" % (sourceImg, ny))
+		#print("imageFile=%s, ny = %d" % (sourceImg, ny))
 	
 		xs = 2.0 * xl / nx  #size of pixel source in points
 		ys = 2.0 * yl / ny 
@@ -38,12 +38,12 @@ class Transformation:
 		sourceImSize = getImageSize(sourceImg)
 		ny = sourceImSize[0]
 		
-		##print("imageFile=%s, ny = %d" % (sourceImg, ny))
+		#print("imageFile=%s, ny = %d" % (sourceImg, ny))
 	
 		xs = 2.0 * xl / nx  #size of pixel source in points
 		ys = 2.0 * yl / ny 
 	
-		imageMag = np.zeros((nx, nx))
+		imageMag = np.zeros((ny, ny))
 		for i in range(0, nx):
 			for j in range(0, nx):
 				#pixel -> coordinates in image
@@ -57,7 +57,7 @@ class Transformation:
 				i1 = int((y1+yl)/ys)
 				i2 = int((y2+yl)/ys) 
 				if (i1>=0 and i1<=ny-1) and (i2>=0 and i2<=ny-1):
-					imageMag[i][j] += 1
+					imageMag[i1][i2] += 1
 		return imageMag		
 
 
@@ -77,7 +77,7 @@ class DefinedPointTransformation(Transformation):
 
 	#outDir must exist
 	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, outDir):
-		#print("DefinedPointTransformation.makeAnim")
+		print("DefinedPointTransformation.makeAnim")
 		import os.path
 		flen = len("%d" % ((endPoint * endPoint) / (step * step)))
 		#print("FLEN %d " % flen)
@@ -103,12 +103,12 @@ class DefinedPointTransformation(Transformation):
 class SimpleLensTransformation(DefinedPointTransformation):
 
 	def getSourcePixel(self, x1, x2):
-		##print("x01 = %E, x02 = %E" % (x01, x02))
+		#print("x01 = %E, x02 = %E" % (x01, x02))
 		if x1 == self.x01 and x2 == self.x02:
 			d = 0.0000001 #la chapuza
 		else:
 			d = (x1 - self.x01)**2 + (x2 - self.x02)**2
-		##print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
+		#print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
 		y1 = x1 - (x1 - self.x01)/d
 		y2 = x2 - (x2 - self.x02)/d
 		return [y1, y2]
@@ -122,7 +122,7 @@ class IsothermicSphereTransformation(DefinedPointTransformation):
 			d = 0.0000001 #la chapuza
 		else:
 			d = sqrt((x1 - self.x01)**2 + (x2 - self.x02)**2)
-		##print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
+		#print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
 		y1 = x1 - (x1 - self.x01)/d
 		y2 = x2 - (x2 - self.x02)/d
 		return [y1, y2]
@@ -136,7 +136,7 @@ class QuadrPertTransformation(DefinedPointTransformation):
 
 
 	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, gammaStart, gammaEnd, gammaStep, outDir):
-		#print("QuadrPertTransformation.makeAnim")
+		print("QuadrPertTransformation.makeAnim")
 		import os.path
 		for k in np.arange(gammaStart, gammaEnd, gammaStep):
 			#TODO format %4.3f
@@ -156,10 +156,10 @@ class QuadrPertLensTransformation(QuadrPertTransformation):
 			d = 0.0000001 #la chapuza
 		else:
 			d = (x1 - self.x01)**2 + (x2 - self.x02)**2
-		##print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
+		#print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
 		y1 =  (x1 - self.x01)/d
 		y2 =  (x2 - self.x02)/d
-		##print("getSourcePixel %E" % self.gamma)
+		#print("getSourcePixel %E" % self.gamma)
 		return [(1.0 - self.gamma ) * x1 - y1, (1.0 + self.gamma) * x2 - y2]
 
 	
@@ -171,7 +171,7 @@ class QuadrPertSphereTransformation(QuadrPertTransformation):
 			d = 0.0000001 #la chapuza
 		else:
 			d = sqrt((x1 - self.x01)**2 + (x2 - self.x02)**2)
-		##print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
+		#print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
 		y1 = (x1 - self.x01)/d
 		y2 =  (x2 - self.x02)/d
 		return [(1.0 - self.gamma ) * x1 - y1, (1.0 + self.gamma) * x2 - y2]
