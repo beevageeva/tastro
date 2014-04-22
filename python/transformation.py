@@ -33,13 +33,7 @@ class Transformation:
 					imageData[i][j] = sourceData[i1][i2] 
 		return imageData		
 
-	def getImageMag(self, nx, xl, yl, sourceImg):
-		#print("getSourceMag in Transformation")
-		sourceImSize = getImageSize(sourceImg)
-		ny = sourceImSize[0]
-		
-		#print("imageFile=%s, ny = %d" % (sourceImg, ny))
-	
+	def getImageMag(self, nx, xl, yl, ny):
 		xs = 2.0 * xl / nx  #size of pixel source in points
 		ys = 2.0 * yl / ny 
 	

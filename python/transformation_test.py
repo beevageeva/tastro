@@ -20,8 +20,8 @@ nx = 1000 #number of points of the image
 #xl, yl depends on problem geometry
 #xl = 8 #2*xl = number of matrix image elements (points) of a pixel (image plan)
 #yl = 4 #2*yl = number of matrix image elements (points) of a pixel (source plan)
-xl = 4
-yl = 1
+xl = 3
+yl = 2
 
 #imgFilename = "circle.png"
 imgFilename = "circles.png"
@@ -33,7 +33,7 @@ if transformType == "identity":
 
 elif transformType == "simple_lens":
 	x01 = 0
-	x02 = 0 
+	x02 = 0
 	transformation = SimpleLensTransformation(x01,x02)	
 elif transformType == "simple_lens_quadr_pert":
 	x01 = 0.5
@@ -45,9 +45,9 @@ elif transformType == "isothermic_sphere":
 	x02 = 1 
 	transformation = IsothermicSphereTransformation(x01, x02) 
 elif transformType == "isothermic_sphere_quadr_pert":
-	x01 = -0.8
-	x02 = 0.3
-	gamma = 0.100 #this must be between [0.1 .. 0.7]
+	x01 = 0
+	x02 = 0
+	gamma = -0.5 #this must be between [0.1 .. 0.7]
 	transformation = QuadrPertSphereTransformation(x01, x02, gamma) 
 	
 
@@ -60,17 +60,17 @@ def transformImage(saveToFile = False):
 
 
 
-def getImageMag():
+def getImageMag(ny):
 	print("image mag")
-	title = "%s_%s" % (transformType, imgFilename[:-4])	
-	showImage(transformation.transform(nx, xl, yl, imgFilename), title)
-	imageMag = transformation.getImageMag(nx, xl, yl, imgFilename)
+	title = "%s_mag" % (transformType)	
+	imageMag = transformation.getImageMag(nx, xl, yl, ny)
 	#np.set_printoptions(threshold=np.nan)
 	#print(imageMag)
 	#hor projection
 	#plt.plot(range(0, imageMag.shape[0]), imageMag[int(0.5 * imageMag.shape[0]),:])
 	#hvert projection
-	plt.plot(range(0, imageMag.shape[1]), imageMag[:,int(0.5 * imageMag.shape[0])])
+	#plt.plot(range(0, imageMag.shape[1]), imageMag[:,int(0.5 * imageMag.shape[0])])
+	plt.imshow(imageMag)
 	plt.draw()
 	plt.show()
 
@@ -102,8 +102,8 @@ def createAnimation():
 #save to file
 #transformImage(True)
 #NO save to file
-transformImage()
+#transformImage()
 #createAnimation()
-#getImageMag()
+getImageMag(100)
 
 
