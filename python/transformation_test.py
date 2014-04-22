@@ -45,9 +45,9 @@ elif transformType == "isothermic_sphere":
 	x02 = 1 
 	transformation = IsothermicSphereTransformation(x01, x02) 
 elif transformType == "isothermic_sphere_quadr_pert":
-	x01 = 0.25
-	x02 = 1 
-	gamma = -0.5 #this must be between [0.1 .. 0.7]
+	x01 = -0.8
+	x02 = 0.3
+	gamma = 0.100 #this must be between [0.1 .. 0.7]
 	transformation = QuadrPertSphereTransformation(x01, x02, gamma) 
 	
 
@@ -82,13 +82,13 @@ def createAnimation():
 	folderBasename = "img_%s_%s" % (transformType, imgFilename[:-4])
 	if(isinstance(transformation, QuadrPertTransformation)):
 		#for a range
-		startGamma = 0.6
-		endGamma = 0.71
-		stepGamma = 0.05
+		#startGamma = 0.6
+		#endGamma = 0.71
+		#stepGamma = 0.05
 #		#negative gamma
-#		startGamma = -0.7
-#		endGamma = -0.1
-#		stepGamma = 0.01
+		startGamma = -0.7
+		endGamma = -0.1
+		stepGamma = 0.01
 #		#only one point
 #		#just for one gamma value 0.1 (the step) here can be any value except 0!
 #		startGamma = -0.6
@@ -99,9 +99,11 @@ def createAnimation():
 		transformation.makeAnim(nx,xl,yl,imgFilename, endX01X02, stepX01X02, createFolder(folderBasename))
 
 
-
+#save to file
 #transformImage(True)
-createAnimation()
+#NO save to file
+transformImage()
+#createAnimation()
 #getImageMag()
 
 
