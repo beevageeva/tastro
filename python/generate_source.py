@@ -102,4 +102,23 @@ def showImage(A, title=None, saveFilename=None):
 		plt.show()
 
 
+def show3Images(A, B, C, title=None, saveFilename = None):
+	print("show3Images")
+	if(saveFilename):
+		print("saveFilename" + saveFilename)
+	fig = plt.figure(1)
+	ax1= fig.add_subplot(1, 2, 1)
+	ax2= fig.add_subplot(1, 2, 2)
+	ax1.imshow(A)
+	ax2.imshow(C)
+	ax2.imshow(B, alpha=0.5)
+	if(title):
+		plt.title(title)
+	if(saveFilename):
+		plt.savefig(saveFilename)
+	else:
+		plt.draw()
+		plt.show()
+ 	
+
 

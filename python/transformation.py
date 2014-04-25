@@ -54,6 +54,18 @@ class Transformation:
 					imageMag[i1][i2] += 1
 		return imageMag		
 
+	def showTransform(self,nx, xl, yl, sourceFilename, withMagMap = False, title=None, imgFullname=None):
+		A = self.transform(nx, xl, yl, sourceFilename)
+		if(withMagMap):
+			from generate_source import show3Images
+			imageData = readImage(sourceFilename)
+			ny = len(imageData) #assumes a square image
+			imageMag = self.getImageMag(nx, xl, yl, ny)
+			show3Images(A, imageMag, imageData, title, imgFullname)
+		else:
+			showImage(A, title, imgFullname)
+
+
 
 class IdentityTransformation(Transformation):
 	
@@ -70,7 +82,7 @@ class DefinedPointTransformation(Transformation):
 		self.x02 = x02
 
 	#outDir must exist
-	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, outDir):
+	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, outDir, withMagMap=False):
 		print("DefinedPointTransformation.makeAnim")
 		import os.path
 		flen = len("%d" % ((endPoint * endPoint) / (step * step)))
@@ -91,8 +103,9 @@ class DefinedPointTransformation(Transformation):
 				
 				for k in range(0, flen - len(imgname)):
 					imgname = "0" + imgname
-				A = self.transform(nx, xl, yl, sourceFilename)
-				showImage(A, title, os.path.join(outDir, imgname))
+
+				self.showTransform(nx, xl, yl, sourceFilename, withMagMap, title, os.path.join(outDir, imgname))
+
 
 class SimpleLensTransformation(DefinedPointTransformation):
 
@@ -129,7 +142,7 @@ class QuadrPertTransformation(DefinedPointTransformation):
 		self.gamma = gamma
 
 
-	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, gammaStart, gammaEnd, gammaStep, outDir):
+	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, gammaStart, gammaEnd, gammaStep, outDir, withMagMap=False):
 		print("QuadrPertTransformation.makeAnim")
 		import os.path
 		for k in np.arange(gammaStart, gammaEnd, gammaStep):
@@ -137,7 +150,7 @@ class QuadrPertTransformation(DefinedPointTransformation):
 			self.gamma = k
 			newdir = os.path.join(outDir, ("%4.3f" % k) )
 			os.mkdir(newdir)
-			DefinedPointTransformation.makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, newdir)
+			DefinedPointTransformation.makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, newdir, withMagMap)
 
 
 class QuadrPertLensTransformation(QuadrPertTransformation):
@@ -145,7 +158,6 @@ class QuadrPertLensTransformation(QuadrPertTransformation):
 
 	def getSourcePixel(self, x1, x2):
 		#print("getSourcePixel(%E, %E) QuadrPertTransformation self.01 = %E, self.x02 = %E, self.gamma = %E" % (x1, x2, self.x01, self.x02, self.gamma))
-		#sres =  self.cls.getSourcePixel(self, x1, x2)
 		if x1 == self.x01 and x2 == self.x02:
 			d = 0.0000001 #la chapuza
 		else:
@@ -169,3 +181,31 @@ class QuadrPertSphereTransformation(QuadrPertTransformation):
 		y1 = (x1 - self.x01)/d
 		y2 =  (x2 - self.x02)/d
 		return [(1.0 - self.gamma ) * x1 - y1, (1.0 + self.gamma) * x2 - y2]
+
+
+
+class BinarySystemTransformation(Transformation):
+	#k = M1/M2
+	def __init__(self, k, a):
+		self.x11 = -0.5 * a
+		self.x12 = 0.0
+		self.x21 = 0.5 * a
+		self.x22 = 0.0
+		self.eps1 = k / (k+1.0)	
+		self.eps1 = 1 / (k+1.0)	
+
+
+	def getSourcePixel(self, x1, x2):
+		if x1 == self.x11 and x2 == self.x12: 
+			d1 = 0.0000001 #la chapuza
+		elif x1 == self.x21 and x2 == self.x22:
+			d2 = 0.0000001 #la chapuza
+		else:	
+			d1 = (x1 - self.x11)**2 + (x2 - self.x12)**2
+			d2 = (x1 - self.x21)**2 + (x2 - self.x22)**2
+		#print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
+		y1 = x1 - self.eps1 *  (x1 - self.x11)/d1 - self.eps2 * (x1 - self.x21) / d2
+		y2 = x2 - self.eps1 *  (x2 - self.x12)/d1 - self.eps2 * (x2 - self.x22) / d2
+		#print("getSourcePixel %E" % self.gamma)
+		return [y1, y2]
+
