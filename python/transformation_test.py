@@ -55,8 +55,13 @@ elif transformType == "binary_system":
 	#a = 1.2
 	#k = 0.1
 	#a = 1.5
-	k = 0.01
-	a = 1.5
+	#k = 0.01
+	#k = 0.5
+	#k = 1
+	#a = 1.5
+	#nature planet
+	k = 7.6 * 10 ** (-5)
+	a = 1.61
 	transformation = BinarySystemTransformation(k, a) 
 	
 
@@ -119,6 +124,7 @@ def createAnimation():
 #transformImage()
 #this creates an animation see withMagMap in function impl to set either to show the magnification map supeposed on the source image
 #createAnimation()
-getImageMag(1000)
+#getImageMag(1000)
 #transformation.showTransform(nx, xl, yl, "circles.png", True)
-
+#transformation.makeAnim(nx, xl, yl, ny, startK, endK, stepK, outDir)
+transformation.makeAnim(nx, xl, yl, 1000, 1, 7.6 * 10 ** (-5), -0.1, createFolder("outBS"))

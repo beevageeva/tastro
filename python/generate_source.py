@@ -92,7 +92,7 @@ def showImage(A, title=None, saveFilename=None):
 	#plt.imshow(A, interpolation='nearest')
 	#antialiasing	
 	plt.imshow(A)
-	plt.grid()
+	plt.grid(True)
 	if(title):
 		plt.title(title)
 	if(saveFilename):

@@ -194,20 +194,51 @@ class BinarySystemTransformation(Transformation):
 		self.x21 = self.eps1 * a
 		self.x22 = 0.0
 
+	
+	def setK(self, k):
+		#get a 
+		a =  self.x21 / self.eps1
+		self.eps1 = k / (k+1.0)	
+		self.eps2 = 1 / (k+1.0)	
+		self.x11 = -self.eps2 * a
+		self.x21 = self.eps1 * a
+		
+
 
 	def getSourcePixel(self, x1, x2):
 		d1 = 0
 		d2 = 0
 		if x1 == self.x11 and x2 == self.x12:
 			d1 = 0.0000001 #la chapuza
-		elif x1 == self.x21 and x2 == self.x22:
+		else:
+			d1 = (x1 - self.x11)**2 + (x2 - self.x12)**2
+		if x1 == self.x21 and x2 == self.x22:
 			d2 = 0.0000001 #la chapuza
 		else:	
-			d1 = (x1 - self.x11)**2 + (x2 - self.x12)**2
 			d2 = (x1 - self.x21)**2 + (x2 - self.x22)**2
-		#print("x1=%E,x2=%E,d=%E" % (x1,x2,d))
+		#print("x11=%E,x12=%E,x21=%E,x22=%E,x1=%E,x2=%E,d1=%E,d2=%E,%s,%s" % (self.x11, self.x12, self.x21,self.x22,x1,x2,d1,d2, ( x1 == self.x11), ( x2 == self.x12)))
 		y1 = x1 - self.eps1 *  (x1 - self.x11)/d1 - self.eps2 * (x1 - self.x21) / d2
 		y2 = x2 - self.eps1 *  (x2 - self.x12)/d1 - self.eps2 * (x2 - self.x22) / d2
 		#print("getSourcePixel %E" % self.gamma)
 		return [y1, y2]
 
+	#outDir must exist
+	def makeAnim(self, nx, xl, yl, ny, startK, endK, stepK, outDir):
+		print("BinarySystemTransformation.makeAnim")
+		import os.path
+		print(((endK - startK) / stepK))
+		flen = len("%d" % ((endK - startK) / stepK))
+		print("FLEN %d " % flen)
+		npoints = int((endK - startK)/stepK)
+		for k in np.linspace(startK, endK, npoints):
+			#print("i=%4.2f, j=%4.2f" % (i, j))
+			self.setK(k)
+			title = "k=%1.6f" %(k)
+			imgname = "%d" % abs(k / stepK)
+			#print("title=%s, imgname(before padding)=%s, d1=%E, d2=%E, base = %E" % (title, imgname, d1, d2, (endPoint / step)))	
+			
+			for i in range(0, flen - len(imgname)):
+				imgname = "0" + imgname
+			imgFile = os.path.join(outDir, imgname)
+			imageMag = self.getImageMag(nx, xl, yl, ny)
+			showImage(imageMag, title, imgFile)
