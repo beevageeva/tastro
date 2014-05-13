@@ -62,7 +62,14 @@ elif transformType == "binary_system":
 	#nature planet
 	k = 7.6 * 10 ** (-5)
 	a = 1.61
-	transformation = BinarySystemTransformation(k, a) 
+	transformation = BinarySystemTransformation(k, a)
+
+def getCurve(theta, u0, imageArray):
+	n = len(imageArray) - 1
+	y,x=np.ogrid[-n / 2: n/2 + 1, -n / 2: n/2 + 1]
+	delta = 1
+	mask = np.absolute(y - np.tan(theta) * x - u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta))) < delta
+	return imageArray[mask]
 	
 
 def transformImage(saveToFile = False, withMagMap = False):
@@ -82,9 +89,15 @@ def getImageMag(ny):
 	#print(imageMag)
 	#hor projection
 	#plt.plot(range(0, imageMag.shape[0]), imageMag[int(0.5 * imageMag.shape[0]),:])
-	#hvert projection
+	#vert projection
 	#plt.plot(range(0, imageMag.shape[1]), imageMag[:,int(0.5 * imageMag.shape[0])])
-	plt.imshow(imageMag)
+	#for binary systems plot on the curve y = tan(theta) * x + u0 * (cos(theta) + sin(theta) * tan(theta))
+	u0 = 0.359
+	theta = 2.756 #radians	
+	res = getCurve(theta, u0, imageMag)	
+	plt.plot(range(0, len(res)), res)
+	#plot image
+	#plt.imshow(imageMag)
 	plt.draw()
 	plt.show()
 
@@ -124,7 +137,8 @@ def createAnimation():
 #transformImage()
 #this creates an animation see withMagMap in function impl to set either to show the magnification map supeposed on the source image
 #createAnimation()
-#getImageMag(1000)
+getImageMag(100)
 #transformation.showTransform(nx, xl, yl, "circles.png", True)
 #transformation.makeAnim(nx, xl, yl, ny, startK, endK, stepK, outDir)
-transformation.makeAnim(nx, xl, yl, 1000, 1, 7.6 * 10 ** (-5), -0.1, createFolder("outBS"))
+#transformation.makeAnim(nx, xl, yl, 1000, 1, 7.6 * 10 ** (-5), -0.1, createFolder("outBS"))
+
