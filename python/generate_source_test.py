@@ -6,7 +6,7 @@ def generateImage(shapeType, saveToFile=True):
 	if shapeType == "circle":
 		A = circle(30.0, 100.0)
 	elif shapeType == "circles":
-		A = circles([10.0,20.0,30.0,50.0], 100.0)
+		A = circles([5.0,10.0,20.0,25.0], 100.0)
 	elif shapeType == "rect":
 		A = rect(10.0, 100.0)
 	if saveToFile:
@@ -19,7 +19,7 @@ def generateImage(shapeType, saveToFile=True):
 
 
 def testSaveImages():
-	A = circles([2.5,5,7.5,10.0], 25.0)
+	A = circles([5,10,20,25.0], 100.0)
 	print("from source generation")
 	print(A)
 	saveImage(A, "test-circles")

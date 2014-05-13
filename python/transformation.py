@@ -187,16 +187,18 @@ class QuadrPertSphereTransformation(QuadrPertTransformation):
 class BinarySystemTransformation(Transformation):
 	#k = M1/M2
 	def __init__(self, k, a):
-		self.x11 = -0.5 * a
-		self.x12 = 0.0
-		self.x21 = 0.5 * a
-		self.x22 = 0.0
 		self.eps1 = k / (k+1.0)	
-		self.eps1 = 1 / (k+1.0)	
+		self.eps2 = 1 / (k+1.0)	
+		self.x11 = -self.eps2 * a
+		self.x12 = 0.0
+		self.x21 = self.eps1 * a
+		self.x22 = 0.0
 
 
 	def getSourcePixel(self, x1, x2):
-		if x1 == self.x11 and x2 == self.x12: 
+		d1 = 0
+		d2 = 0
+		if x1 == self.x11 and x2 == self.x12:
 			d1 = 0.0000001 #la chapuza
 		elif x1 == self.x21 and x2 == self.x22:
 			d2 = 0.0000001 #la chapuza

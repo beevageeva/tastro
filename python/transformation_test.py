@@ -12,16 +12,17 @@ import matplotlib.pyplot as plt
 #transformType = "simple_lens" 
 #transformType = "simple_lens_quadr_pert" 
 #transformType = "isothermic_sphere" 
-transformType = "isothermic_sphere_quadr_pert" 
+#transformType = "isothermic_sphere_quadr_pert" 
+transformType = "binary_system" 
 
 
-nx = 400 #number of points of the image
+nx = 1000 #number of points of the image
 #nx = 200 #number of points of the image
 #xl, yl depends on problem geometry
 #xl = 8 #2*xl = number of matrix image elements (points) of a pixel (image plan)
 #yl = 4 #2*yl = number of matrix image elements (points) of a pixel (source plan)
-xl = 6
-yl = 3
+xl = 4
+yl = 2
 
 #imgFilename = "circle.png"
 imgFilename = "circles.png"
@@ -46,9 +47,17 @@ elif transformType == "isothermic_sphere":
 	transformation = IsothermicSphereTransformation(x01, x02) 
 elif transformType == "isothermic_sphere_quadr_pert":
 	x01 = 0.8
-	x02 = 3.1
+	x02 = 0.8
 	gamma = -0.5 #this must be between [0.1 .. 0.7]
 	transformation = QuadrPertSphereTransformation(x01, x02, gamma) 
+elif transformType == "binary_system":
+	#k = 10 ** (-3)
+	#a = 1.2
+	#k = 0.1
+	#a = 1.5
+	k = 0.01
+	a = 1.5
+	transformation = BinarySystemTransformation(k, a) 
 	
 
 def transformImage(saveToFile = False, withMagMap = False):
@@ -105,11 +114,11 @@ def createAnimation():
 #save to file with mag Map
 #transformImage(True, True)
 #NO save to file, with mag map
-transformImage(False, True)
+#transformImage(False, True)
 #NO save to file, NO mag map
 #transformImage()
 #this creates an animation see withMagMap in function impl to set either to show the magnification map supeposed on the source image
 #createAnimation()
-#getImageMag(100)
+getImageMag(1000)
 #transformation.showTransform(nx, xl, yl, "circles.png", True)
 
