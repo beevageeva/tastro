@@ -21,8 +21,8 @@ nx = 1000 #number of points of the image
 #xl, yl depends on problem geometry
 #xl = 8 #2*xl = number of matrix image elements (points) of a pixel (image plan)
 #yl = 4 #2*yl = number of matrix image elements (points) of a pixel (source plan)
-xl = 4
-yl = 2
+xl = 1 
+yl = 0.00025
 
 #imgFilename = "circle.png"
 imgFilename = "circles.png"
@@ -61,16 +61,30 @@ elif transformType == "binary_system":
 	#a = 1.5
 	#nature planet
 	k = 7.6 * 10 ** (-5)
+	#k = 7.6 * 10 ** (-4)
 	a = 1.61
 	transformation = BinarySystemTransformation(k, a)
 
-def getCurve(theta, u0, imageArray):
+def getCurveImplicit(theta, u0, imageArray):
 	n = len(imageArray) - 1
 	y,x=np.ogrid[-n / 2: n/2 + 1, -n / 2: n/2 + 1]
-	delta = 1
+	delta = 0.5
 	mask = np.absolute(y - np.tan(theta) * x - u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta))) < delta
-	return imageArray[mask]
+	return [imageArray[mask], mask]
 	
+
+def getCurve(theta, u0, imageArray):
+	mask = np.zeros(imageArray.shape)
+	n = len(imageArray) - 1
+	for xval in range(0,n+1):
+		yval =  int(np.tan(theta) * xval + u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta)))
+		if (yval>=0) and (yval<=n):
+			mask[xval][yval]  = 1
+	mask = mask.astype(int)
+	return [imageArray[mask], mask]
+
+
+
 
 def transformImage(saveToFile = False, withMagMap = False):
 	title = "%s_%s" % (transformType, imgFilename[:-4])
@@ -84,7 +98,10 @@ def transformImage(saveToFile = False, withMagMap = False):
 def getImageMag(ny):
 	print("image mag")
 	title = "%s_mag" % (transformType)	
+	from datetime import datetime
+	print(datetime.now())
 	imageMag = transformation.getImageMag(nx, xl, yl, ny)
+	print(datetime.now())
 	#np.set_printoptions(threshold=np.nan)
 	#print(imageMag)
 	#hor projection
@@ -93,11 +110,26 @@ def getImageMag(ny):
 	#plt.plot(range(0, imageMag.shape[1]), imageMag[:,int(0.5 * imageMag.shape[0])])
 	#for binary systems plot on the curve y = tan(theta) * x + u0 * (cos(theta) + sin(theta) * tan(theta))
 	u0 = 0.359
-	theta = 2.756 #radians	
-	res = getCurve(theta, u0, imageMag)	
-	plt.plot(range(0, len(res)), res)
+	theta = 2.756 #radians
+	
+	#res = getCurveImplicit(theta, u0, imageMag)	
+	res = getCurve(theta, u0, imageMag)
+	np.set_printoptions(threshold='nan')
+	print(res[0].shape)	
+	print(res[1].shape)	
+	plt.plot(range(0, len(res[0])), res[0])
+	plt.figure(2)
+	#make a different image and plot the other on top
+	curveIm = np.ones(imageMag.shape)
+	curveIm[res[1]]	= 0
+	plt.imshow(curveIm)
+	plt.imshow(imageMag, alpha=0.5)
+	#change directly imageMag array
+	#imageMag[res[1]] = -1
 	#plot image
 	#plt.imshow(imageMag)
+
+
 	plt.draw()
 	plt.show()
 
