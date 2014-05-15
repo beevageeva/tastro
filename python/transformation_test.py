@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 transformType = "binary_system" 
 
 
-nx = 1000 #number of points of the image
+nx = 30000 #number of points of the image
 #nx = 200 #number of points of the image
 #xl, yl depends on problem geometry
 #xl = 8 #2*xl = number of matrix image elements (points) of a pixel (image plan)
@@ -65,22 +65,37 @@ elif transformType == "binary_system":
 	a = 1.61
 	transformation = BinarySystemTransformation(k, a)
 
-def getCurveImplicit(theta, u0, imageArray):
-	n = len(imageArray) - 1
-	y,x=np.ogrid[-n / 2: n/2 + 1, -n / 2: n/2 + 1]
-	delta = 0.5
-	mask = np.absolute(y - np.tan(theta) * x - u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta))) < delta
-	return [imageArray[mask], mask]
+#def getCurveImplicit(theta, u0, imageArray):
+#	n = len(imageArray) - 1
+#	#y,x=np.ogrid[-n / 2: n/2 + 1, -n / 2: n/2 + 1]
+#	y,x=np.ogrid[0: n, 0: n]
+#	#print("u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta))")
+#	#print(u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta)))
+#	#delta = 0.5
+#	delta = 5
+#	#delta = 50
+#	#mask = np.absolute(y - np.tan(theta) * x - u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta))) < delta
+#	mask = y - np.tan(theta) * x + u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta)) < delta
+#	#mask = np.absolute(n * (y - np.tan(theta) * x - u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta)))) < delta
+#	#print("mask.shape")
+#	#print(mask.shape)
+#	return [imageArray[mask], mask]
 	
 
 def getCurve(theta, u0, imageArray):
 	mask = np.zeros(imageArray.shape)
 	n = len(imageArray) - 1
+	print("u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta))")
+	print(u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta)))
 	for xval in range(0,n+1):
-		yval =  int(np.tan(theta) * xval + u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta)))
+		#yval =  int(n * abs(np.tan(theta) * xval + u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta)))) #scaled?
+		yval =  int(abs(np.tan(theta) * xval + u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta))))
+		#print("xval=%d,yval=%d" % (xval,yval))
 		if (yval>=0) and (yval<=n):
 			mask[xval][yval]  = 1
-	mask = mask.astype(int)
+	mask = mask.astype(bool)
+	#print("mask.shape")
+	#print(mask.shape)
 	return [imageArray[mask], mask]
 
 
@@ -112,11 +127,10 @@ def getImageMag(ny):
 	u0 = 0.359
 	theta = 2.756 #radians
 	
-	#res = getCurveImplicit(theta, u0, imageMag)	
 	res = getCurve(theta, u0, imageMag)
-	np.set_printoptions(threshold='nan')
-	print(res[0].shape)	
-	print(res[1].shape)	
+	#np.set_printoptions(threshold='nan')
+	#print(res[0].shape)	
+	#print(res[1].shape)	
 	plt.plot(range(0, len(res[0])), res[0])
 	plt.figure(2)
 	#make a different image and plot the other on top
