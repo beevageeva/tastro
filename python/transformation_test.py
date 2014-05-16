@@ -12,20 +12,24 @@ import matplotlib.pyplot as plt
 #transformType = "simple_lens" 
 #transformType = "simple_lens_quadr_pert" 
 #transformType = "isothermic_sphere" 
-#transformType = "isothermic_sphere_quadr_pert" 
-transformType = "binary_system" 
+transformType = "isothermic_sphere_quadr_pert" 
+#transformType = "binary_system" 
 
 
-nx = 30000 #number of points of the image
-#nx = 200 #number of points of the image
+#nx = 1000 #number of points of the image
+nx = 400 #number of points of the image
 #xl, yl depends on problem geometry
 #xl = 8 #2*xl = number of matrix image elements (points) of a pixel (image plan)
 #yl = 4 #2*yl = number of matrix image elements (points) of a pixel (source plan)
-xl = 1 
-yl = 0.00025
+#xl = 1 
+xl = 1
+
+#yl = 0.00025
+yl = 4
 
 #imgFilename = "circle.png"
-imgFilename = "circles.png"
+#imgFilename = "circles.png"
+imgFilename = "hubble.png"
 
 transformation = None
 
@@ -82,17 +86,24 @@ elif transformType == "binary_system":
 #	return [imageArray[mask], mask]
 	
 
-def getCurve(theta, u0, imageArray):
+def getCurve(theta, u0, imageArray,ny):
+	ys = 2.0 * yl / ny 
+	xs = 2.0 * xl / nx 
 	mask = np.zeros(imageArray.shape)
 	n = len(imageArray) - 1
 	print("u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta))")
 	print(u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta)))
-	for xval in range(0,n+1):
+	for xval in range(2*xl):
 		#yval =  int(n * abs(np.tan(theta) * xval + u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta)))) #scaled?
 		yval =  int(abs(np.tan(theta) * xval + u0 * (np.cos(theta) + np.sin(theta) * np.tan(theta))))
-		#print("xval=%d,yval=%d" % (xval,yval))
-		if (yval>=0) and (yval<=n):
-			mask[xval][yval]  = 1
+		i1 = int((xval+xl)/xs)
+		i2 = int((yval+xl)/xs) 
+		print("xval=%d,yval=%d" % (xval,yval))
+		print("i1=%d,i2=%d" % (i1,i2))
+		#if (yval>=0) and (yval<=n):
+		if (i1>=0) and (i1<=n) and (i1>=0) and (i2<=n):
+			#mask[xval][yval]  = 1
+			mask[i1][i2]  = 1
 	mask = mask.astype(bool)
 	#print("mask.shape")
 	#print(mask.shape)
@@ -127,7 +138,7 @@ def getImageMag(ny):
 	u0 = 0.359
 	theta = 2.756 #radians
 	
-	res = getCurve(theta, u0, imageMag)
+	res = getCurve(theta, u0, imageMag, ny)
 	#np.set_printoptions(threshold='nan')
 	#print(res[0].shape)	
 	#print(res[1].shape)	
@@ -136,12 +147,12 @@ def getImageMag(ny):
 	#make a different image and plot the other on top
 	curveIm = np.ones(imageMag.shape)
 	curveIm[res[1]]	= 0
-	plt.imshow(curveIm)
-	plt.imshow(imageMag, alpha=0.5)
+	#plt.imshow(curveIm)
+	#plt.imshow(imageMag, alpha=0.5)
 	#change directly imageMag array
 	#imageMag[res[1]] = -1
 	#plot image
-	#plt.imshow(imageMag)
+	plt.imshow(np.log(imageMag))
 
 
 	plt.draw()
@@ -151,6 +162,9 @@ def getImageMag(ny):
 
 def createAnimation():
 	withMagMap = True
+	#withMagMap = False
+	isRgb = True
+	#isRgb = False
 	endX01X02 = 4
 	stepX01X02 = 0.1
 	folderBasename = "img_%s_%s" % (transformType, imgFilename[:-4])
@@ -160,17 +174,17 @@ def createAnimation():
 		#endGamma = 0.71
 		#stepGamma = 0.05
 #		#negative gamma
-		startGamma = -0.7
-		endGamma = 0.7
+		startGamma = 0.7
+		endGamma = 0.71
 		stepGamma = 0.1
 #		#only one point
 #		#just for one gamma value 0.1 (the step) here can be any value except 0!
 #		startGamma = -0.6
 #		endGamma = -0.599
 #		stepGamma = 0.1
-		transformation.makeAnim(nx,xl,yl,imgFilename, endX01X02, stepX01X02, startGamma, endGamma, stepGamma, createFolder(folderBasename), withMagMap)
+		transformation.makeAnim(nx,xl,yl,imgFilename, endX01X02, stepX01X02, startGamma, endGamma, stepGamma, createFolder(folderBasename), withMagMap, isRgb)
 	else:
-		transformation.makeAnim(nx,xl,yl,imgFilename, endX01X02, stepX01X02, createFolder(folderBasename), withMagMap)
+		transformation.makeAnim(nx,xl,yl,imgFilename, endX01X02, stepX01X02, createFolder(folderBasename), withMagMap, isRgb)
 
 
 #save to file and NO mag Map
@@ -182,8 +196,8 @@ def createAnimation():
 #NO save to file, NO mag map
 #transformImage()
 #this creates an animation see withMagMap in function impl to set either to show the magnification map supeposed on the source image
-#createAnimation()
-getImageMag(100)
+createAnimation()
+#getImageMag(100)
 #transformation.showTransform(nx, xl, yl, "circles.png", True)
 #transformation.makeAnim(nx, xl, yl, ny, startK, endK, stepK, outDir)
 #transformation.makeAnim(nx, xl, yl, 1000, 1, 7.6 * 10 ** (-5), -0.1, createFolder("outBS"))

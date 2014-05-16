@@ -30,5 +30,8 @@ def testSaveImages():
 	showImage(B)
 
 
-generateImage("circles")
-showImage(readImage("circles.png"))
+#generateImage("circles")
+#showImage(readImage("circles.png"))
+A = readImage("hubble.png")
+print(A)
+showImage(readImage("hubble.png"))

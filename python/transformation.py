@@ -6,7 +6,7 @@ from math import sqrt
 #it won't raise NotImplementedError
 class Transformation:
 
-	def transform(self, nx, xl, yl, sourceImg):
+	def transform(self, nx, xl, yl, sourceImg, isRgb = False):
 		#print("transform in Transformation")
 		sourceData = readImage(sourceImg)
 		ny = sourceData.shape[0]
@@ -15,8 +15,10 @@ class Transformation:
 	
 		xs = 2.0 * xl / nx  #size of pixel source in points
 		ys = 2.0 * yl / ny 
-	
-		imageData = np.zeros((nx, nx))
+		if(isRgb):	
+			imageData = np.zeros((nx, nx, 3))
+		else:	
+			imageData = np.zeros((nx, nx))
 		for i in range(0, nx):
 			for j in range(0, nx):
 				#pixel -> coordinates in image
@@ -30,7 +32,7 @@ class Transformation:
 				i1 = int((y1+yl)/ys)
 				i2 = int((y2+yl)/ys) 
 				if (i1>=0 and i1<=ny-1) and (i2>=0 and i2<=ny-1):
-					imageData[i][j] = sourceData[i1][i2] 
+					imageData[i][j] = sourceData[i1][i2]
 		return imageData		
 
 	def getImageMag(self, nx, xl, yl, ny):
@@ -47,15 +49,15 @@ class Transformation:
 				sourcePixel = self.getSourcePixel(x1, x2)
 				y1 = sourcePixel[0]
 				y2 = sourcePixel[1]
-				#find corresponding points in image space
+				#find corresponding points in source plane
 				i1 = int((y1+yl)/ys)
 				i2 = int((y2+yl)/ys) 
 				if (i1>=0 and i1<=ny-1) and (i2>=0 and i2<=ny-1):
 					imageMag[i1][i2] += 1
 		return imageMag		
 
-	def showTransform(self,nx, xl, yl, sourceFilename, withMagMap = False, title=None, imgFullname=None):
-		A = self.transform(nx, xl, yl, sourceFilename)
+	def showTransform(self,nx, xl, yl, sourceFilename, withMagMap = False, title=None, imgFullname=None, isRgb = False):
+		A = self.transform(nx, xl, yl, sourceFilename, isRgb)
 		if(withMagMap):
 			from generate_source import show3Images
 			imageData = readImage(sourceFilename)
@@ -82,7 +84,7 @@ class DefinedPointTransformation(Transformation):
 		self.x02 = x02
 
 	#outDir must exist
-	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, outDir, withMagMap=False):
+	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, outDir, withMagMap=False, isRgb = False):
 		print("DefinedPointTransformation.makeAnim")
 		import os.path
 		flen = len("%d" % ((endPoint * endPoint) / (step * step)))
@@ -104,7 +106,7 @@ class DefinedPointTransformation(Transformation):
 				for k in range(0, flen - len(imgname)):
 					imgname = "0" + imgname
 
-				self.showTransform(nx, xl, yl, sourceFilename, withMagMap, title, os.path.join(outDir, imgname))
+				self.showTransform(nx, xl, yl, sourceFilename, withMagMap, title, os.path.join(outDir, imgname), isRgb)
 
 
 class SimpleLensTransformation(DefinedPointTransformation):
@@ -142,7 +144,7 @@ class QuadrPertTransformation(DefinedPointTransformation):
 		self.gamma = gamma
 
 
-	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, gammaStart, gammaEnd, gammaStep, outDir, withMagMap=False):
+	def makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, gammaStart, gammaEnd, gammaStep, outDir, withMagMap=False, isRgb = False):
 		print("QuadrPertTransformation.makeAnim")
 		import os.path
 		for k in np.arange(gammaStart, gammaEnd, gammaStep):
@@ -150,7 +152,7 @@ class QuadrPertTransformation(DefinedPointTransformation):
 			self.gamma = k
 			newdir = os.path.join(outDir, ("%4.3f" % k) )
 			os.mkdir(newdir)
-			DefinedPointTransformation.makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, newdir, withMagMap)
+			DefinedPointTransformation.makeAnim(self, nx, xl, yl, sourceFilename, endPoint, step, newdir, withMagMap, isRgb)
 
 
 class QuadrPertLensTransformation(QuadrPertTransformation):
