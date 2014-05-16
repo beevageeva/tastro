@@ -17,19 +17,19 @@ transformType = "isothermic_sphere_quadr_pert"
 
 
 #nx = 1000 #number of points of the image
-nx = 400 #number of points of the image
+nx = 1000 #number of points of the image
 #xl, yl depends on problem geometry
 #xl = 8 #2*xl = number of matrix image elements (points) of a pixel (image plan)
 #yl = 4 #2*yl = number of matrix image elements (points) of a pixel (source plan)
+#for planet - star binary system
 #xl = 1 
-xl = 1
-
 #yl = 0.00025
+xl = 4
 yl = 4
 
 #imgFilename = "circle.png"
-#imgFilename = "circles.png"
-imgFilename = "hubble.png"
+imgFilename = "circles.png"
+#imgFilename = "hubble.png"
 
 transformation = None
 
@@ -43,16 +43,17 @@ elif transformType == "simple_lens":
 elif transformType == "simple_lens_quadr_pert":
 	x01 = 0.5
 	x02 = 0 
-	gamma = 0.5 #this must be between [0.1 .. 0.7]
+	gamma = 0.0 #this must be between [0.1 .. 0.7]
 	transformation = QuadrPertLensTransformation(x01, x02, gamma) 
 elif transformType == "isothermic_sphere":
 	x01 = 0.5
 	x02 = 1 
 	transformation = IsothermicSphereTransformation(x01, x02) 
 elif transformType == "isothermic_sphere_quadr_pert":
-	x01 = 0.8
-	x02 = 0.8
-	gamma = -0.5 #this must be between [0.1 .. 0.7]
+	x01 = -0.1
+	x02 = -0.2
+	gamma = 0.6 #this must be between [0.1 .. 0.7]
+	
 	transformation = QuadrPertSphereTransformation(x01, x02, gamma) 
 elif transformType == "binary_system":
 	#k = 10 ** (-3)
@@ -196,9 +197,11 @@ def createAnimation():
 #NO save to file, NO mag map
 #transformImage()
 #this creates an animation see withMagMap in function impl to set either to show the magnification map supeposed on the source image
-createAnimation()
+#createAnimation()
 #getImageMag(100)
-#transformation.showTransform(nx, xl, yl, "circles.png", True)
+transformation.showTransform(nx, xl, yl, "circles.png", True)
+#with hubble.png set isRgb to True
+#transformation.showTransform(nx, xl, yl, "hubble.png", True, None, None, True)
 #transformation.makeAnim(nx, xl, yl, ny, startK, endK, stepK, outDir)
 #transformation.makeAnim(nx, xl, yl, 1000, 1, 7.6 * 10 ** (-5), -0.1, createFolder("outBS"))
 
